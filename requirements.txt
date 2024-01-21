@@ -1,0 +1,5 @@
+fitparse>=1.2.0
+exif
+matplotlib
+Pillow
+pyzbar
