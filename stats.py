@@ -51,9 +51,12 @@ class Month:
             self.maxSpeed = maxSpeed
 
     def print(self):
-        print(f"{calendar.month_abbr[self.num]}: {self.miles:.2f} Miles, {formatDuration(self.moving)} Hours, "
-              f"{self.rides} Rides, {self.avgSpeed / self.rides:.2f} Average Speed, "
-              f"{self.maxSpeed:.2f} Max Speed, {self.temp / self.rides:.1f} Average Temp")
+        if (self.rides > 0):
+            print(f"{calendar.month_abbr[self.num]}: {self.miles:.2f} Miles, {formatDuration(self.moving)} Hours, "
+                  f"{self.rides} Rides, {self.avgSpeed / self.rides:.2f} Average Speed, "
+                  f"{self.maxSpeed:.2f} Max Speed, {self.temp / self.rides:.1f} Average Temp")
+        else:
+            print(f"{calendar.month_abbr[self.num]}: No Data")
 
 
 totalTime = 0
