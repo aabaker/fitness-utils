@@ -10,12 +10,20 @@ import datetime
 import exif
 import json
 import os
-from PIL import Image, ImageFilter
+from PIL import Image
 from pyzbar.pyzbar import decode
+from image_filters import generate_variants
 
 verbose = 2
 # Maximum time difference for two images to be considered the same code
 timedelta = 90
+
+enabled_tests = [
+    "blur",
+    "usm_blur",
+    "median_3",
+    "median_threshold_175"
+]
 
 
 def find_images(srcpath):
@@ -56,50 +64,54 @@ def batch_images(images, timedelta, verbose):
 
 
 def decode_images(batches, verbose):
-    raw = 0
-    usm = 0
-    smooth = 0
+    variant_successes = {}
 
     result = []
 
     for batch in batches:
         done = False
+
         for image in batch:
-            img = Image.open(image[0])
-            decoded = decode(img)
-            if len(decoded) != 0:
-                done = True
-                raw += 1
-                if verbose > 0:
-                    print(f'Decoded image {image[0]} in raw mode')
+            with Image.open(image[0]) as source:
+                img = source.convert("RGB")
+
+            for variant_name, candidate in generate_variants(img, enabled_tests):
+
+                # Initialise count for this variant
+                variant_successes.setdefault(variant_name, 0)
+
+                decoded = decode(candidate)
+
+                if len(decoded) != 0:
+                    done = True
+                    variant_successes[variant_name] += 1
+
+                    if verbose > 0:
+                        print(
+                            f'Decoded image {image[0]} '
+                            f'using {variant_name}'
+                        )
+
+                    break
+
+            if done:
                 break
-            else:
-                img2 = img.filter(ImageFilter.UnsharpMask(radius=8, percent=800, threshold=0))
-                img2 = img2.filter(ImageFilter.GaussianBlur(radius=3))
-                decoded = decode(img2)
-            if len(decoded) != 0:
-                done = True
-                usm += 1
-                if verbose > 0:
-                    print(f'Decoded image {image[0]} in usm mode')
-                break
-            else:
-                img2 = img.filter(ImageFilter.GaussianBlur(radius=3))
-                decoded = decode(img2)
-            if len(decoded) != 0:
-                done = True
-                smooth += 1
-                if verbose > 0:
-                    print(f'Decoded image {image[0]} in smooth mode')
-                break
+
         if done:
             url = decoded[0].data
             js = base64.b64decode(url[url.find(b'&r=') + 3:])
             result.append(json.loads(js))
+
         else:
             print(f'Decode failed for batch {batch[0][0]}')
+
     if verbose > 0:
-        print(f'Decode counts: raw {raw}, usm {usm}, smooth {smooth}')
+        print()
+        print("Decode counts:")
+
+        for variant_name, count in variant_successes.items():
+            print(f"  {variant_name:30s} {count}")
+
     return result
 
 
