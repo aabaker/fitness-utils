@@ -492,3 +492,16 @@ PROCESSING_FUNCTIONS = {
     "usm_blur": usm_blur,
     "blur": blur,
 }
+
+
+def generate_variants(img, enabled_tests):
+    """Generate variants using only enabled processing functions."""
+
+    for test_name in enabled_tests:
+
+        if test_name not in PROCESSING_FUNCTIONS:
+            raise ValueError(
+                f"Unknown processing test: {test_name}"
+            )
+
+        yield from PROCESSING_FUNCTIONS[test_name](img)

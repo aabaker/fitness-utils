@@ -53,19 +53,6 @@ IMAGE_EXTENSIONS = {
 }
 
 
-def generate_variants(img):
-    """Generate variants using only enabled processing functions."""
-
-    for test_name in enabled_tests:
-
-        if test_name not in PROCESSING_FUNCTIONS:
-            raise ValueError(
-                f"Unknown processing test: {test_name}"
-            )
-
-        yield from PROCESSING_FUNCTIONS[test_name](img)
-
-
 # ============================================================
 # QR CODE DETECTION
 # ============================================================
@@ -125,7 +112,7 @@ def test_image(filename, csvfile, summary):
     image_success = False
     image_results = {}
 
-    for variant_name, candidate in generate_variants(img):
+    for variant_name, candidate in generate_variants(img, enabled_tests):
 
         try:
             success = contains_qr_code(candidate)
