@@ -20,7 +20,9 @@ import sys
 
 from pathlib import Path
 
-from image_filters import *
+from image_filters import generate_variants, PROCESSING_FUNCTIONS
+
+from PIL import Image
 
 from pyzbar.pyzbar import decode, ZBarSymbol
 
@@ -300,4 +302,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

@@ -65,7 +65,6 @@ def contrast(img):
     ).enhance(2.0)
 
 
-
 def averaging_filters(img):
     """
     Test box averaging filters at different scales.
@@ -115,6 +114,7 @@ def averaging_filters(img):
             f"average_v_{height}",
             Image.fromarray(result),
         )
+
 
 def sharpening(img):
     """Generate several unsharp-mask sharpening variants."""
@@ -179,6 +179,7 @@ def downscale(img):
                 Image.Resampling.LANCZOS,
             ),
         )
+
 
 def upscale(img):
     """Generate enlarged grayscale images."""
@@ -469,7 +470,7 @@ def blur(img):
 PROCESSING_FUNCTIONS = {
     "original": original,
     "grayscale": grayscale,
-    "colour_channels" : colour_channels,
+    "colour_channels": colour_channels,
     "contrast": contrast,
     "averaging_filters": averaging_filters,
     "sharpening": sharpening,
