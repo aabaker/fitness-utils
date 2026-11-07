@@ -29,8 +29,9 @@ def find_images(srcpath):
             continue
         try:
             timestr = exif.Image(f).datetime
-        except KeyError:
+        except Exception as e:
             f.close()
+            print(f"Exception {e} occurred extracting exif data from file {name}")
             continue
         filetime = datetime.datetime.strptime(timestr, '%Y:%m:%d %H:%M:%S')
         images.append((name, filetime))
@@ -73,7 +74,7 @@ def decode_images(batches, verbose):
                     print(f'Decoded image {image[0]} in raw mode')
                 break
             else:
-                img2 = img.filter(ImageFilter.UnsharpMask(radius=4, percent=400, threshold=0))
+                img2 = img.filter(ImageFilter.UnsharpMask(radius=8, percent=800, threshold=0))
                 img2 = img2.filter(ImageFilter.GaussianBlur(radius=3))
                 decoded = decode(img2)
             if len(decoded) != 0:
@@ -105,7 +106,8 @@ def decode_images(batches, verbose):
 activity = {
         '137': 'Treadmill',
         '138': 'X-Train',
-        '139': 'Cycling'
+        '139': 'Cycling',
+        '222': 'Treadmill'
         }
 
 if __name__ == '__main__':
@@ -133,7 +135,7 @@ if __name__ == '__main__':
         with open(args.json, "w") as f:
             json.dump(sessions, f)
     for session in sessions:
-        ts = datetime.datetime.fromisoformat(session["dt"])
+        ts = datetime.datetime.fromisoformat(session["dt"]) - datetime.timedelta(seconds=int(session["et"]))
         h1 = int(session["et"]) // 3600
         m1 = int(session["et"]) // 60 - h1 * 60
         s1 = int(session["et"]) - h1 * 3600 - m1 * 60
