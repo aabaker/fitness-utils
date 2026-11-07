@@ -1,5 +1,8 @@
 fitparse>=1.2.0
 exif
+gpxpy
 matplotlib
+tcxreader>=0.4.9
 Pillow
+opencv-python
 pyzbar
